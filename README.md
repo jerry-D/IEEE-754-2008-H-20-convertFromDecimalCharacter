@@ -30,9 +30,11 @@ This repository contains the required synthesizable Verilog RTL and test bench t
 ```
 The above example SYMPL IL code performs 16 binaryToCharacterSequence conversions and 16 binaryFromCharacterSequence conversions in as few as 41 clocks.
 
-Below are actual results of sixteen consecutive pushes into thebinaryToCharacterSequence operator, one every clock, followed by 16 pushes of those results back into the binaryFromCharacterSequence operator, as demonstrated in the Verilog test bench provided in this repository.  The easiest way to see results for yourself is to run the simulation on the "free" version of Xilinx Vivado using the files provided at this repository.  Then, in the Vivado simulation environment, simply click on the two RAM modules in the design and scroll down to the first sixteen locations.  Set radix to ASCII to read the contents.
+Below are actual results of sixteen consecutive pushes into the binaryToCharacterSequence operator, one every clock, followed by 16 pushes of those results back into the binaryFromCharacterSequence operator, as demonstrated in the Verilog test bench provided in this repository.  The easiest way to see results for yourself is to run the simulation on the "free" version of Xilinx Vivado using the files provided at this repository.  Then, in the Vivado simulation environment, simply click on the two RAM modules in the design and scroll down to the first sixteen locations.  Set radix to ASCII to read the contents.
 
 It should be noted that the binaryFromCharacterSequence results are actually 66 bits in length.  The two MSBs (not shown) hold an encoded exception (if any) that can be directly tested by the CPU and are automatically copied into the CPU's Status Register upon reading.
+
+Also note that the binaryToCharacterSequence operator can accept binary16, binary32 and binary64 formated numbers directly, without having to explicitly convert them before pushing them in.
 ```
       34-byte Character Sequence Input        Binary64 Result     Comment
 
