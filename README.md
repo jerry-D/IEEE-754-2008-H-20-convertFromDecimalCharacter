@@ -34,7 +34,7 @@ Below are actual results of sixteen consecutive pushes into thebinaryToCharacter
 
 It should be noted that the binaryFromCharacterSequence results are actually 66 bits in length.  The two MSBs (not shown) hold an encoded exception (if any) that can be directly tested by the CPU and are automatically copied into the CPU's Status Register upon reading.
 ```
-      34-byte Character Sequence Result        Binary64 Input     Comment
+      34-byte Character Sequence Input        Binary64 Result     Comment
 
       +3355443194222818687558174133e-020       417FFFFFFF135DDD   //33554431.94222818687558174133
       
