@@ -28,7 +28,7 @@ input Away_q2;
 input [3:0] wraddrs, rdaddrs;   
 input [63:0] wrdata;
 
-output [271:0] rddata;
+output [327:0] rddata;
 output [1:0] exceptCode;
 output ready;
 
@@ -78,9 +78,9 @@ reg [3:0] wraddrs_del_1,
           wraddrs_del_17;
           
 
-wire [271:0] rddata; 
+wire [375:0] rddata; 
 wire [1:0] exceptCode;
-wire [273:0] ascOut;
+wire [377:0] ascOut;
 
 wire [63:0] conv_wrdata;
 
@@ -103,7 +103,7 @@ binToDecCharH20 binToDecChar(
     .ascOut     (ascOut    )
     );                       
 
-RAM_func_dp #(.ADDRS_WIDTH(4), .DATA_WIDTH(274))
+RAM_func_dp #(.ADDRS_WIDTH(4), .DATA_WIDTH(378))
     ram274_binDec(
     .CLK       (CLK    ),
     .RESET     (RESET  ),

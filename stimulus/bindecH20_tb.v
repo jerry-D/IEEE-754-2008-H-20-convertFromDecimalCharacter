@@ -1,7 +1,7 @@
 //bindecH20_tb.v
  `timescale 1ns/100ps
 // Author:  Jerry D. Harthcock
-// Version:  1.00  September 14, 2018
+// Version:  1.01  November 3, 2018
 // Copyright (C) 2018.  All rights reserved.
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ reg reset;
 reg clk;
 
 reg wren_t1;    
-reg [271:0] wrdata_t1;  
+reg [375:0] wrdata_t1;  
 reg rdenA_t1;    
 reg [3:0] rdaddrsA_t1;
 reg rdenB_t1;   
@@ -85,7 +85,7 @@ wire ready_t1;
 
 reg [271:0] result[15:0];
 
-wire [271:0] rddata;
+wire [375:0] rddata;
 wire [1:0] exceptCode;
 wire ready;
 wire [1:0] exceptCodeA_t1;
@@ -173,7 +173,6 @@ func_binDecH20 t(
       wraddrs = 4'h2;
       @(posedge clk);                      
      #1 wrdata = 64'h43B203AF9EE75616;   //1298074214633707008
-//     #1 wrdata = 64'h43B2038F9EE75616;   //1298074214633707008
       wraddrs = 4'h3;
       @(posedge clk);
      #1 wrdata = 64'h52FB5E7E08CA3A8F;   //55751862996326554871e+072
@@ -193,7 +192,7 @@ func_binDecH20 t(
      #1 wrdata = 64'h0010000000000000;   //smallest normal
       wraddrs = 4'h8;
       @(posedge clk);
-     #1 wrdata = 64'hFBFF000000000001;  //-1.88815458970875003819e250
+     #1 wrdata = 64'hFBFF000000000001;  //-1.88815458970875003821e250
       wraddrs = 4'h9;
       @(posedge clk);
      #1 wrdata = 64'h4410000000000000; // =73786976294838206464

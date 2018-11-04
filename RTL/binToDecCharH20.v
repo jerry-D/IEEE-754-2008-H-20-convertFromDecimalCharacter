@@ -1,7 +1,7 @@
 // binToDecCharH20.v
  `timescale 1ns/100ps
  // Author:  Jerry D. Harthcock
- // Version:  1.00  Sept. 14, 2018
+ // Version:  1.02  November 4, 2018
  // Copyright (C) 2018.  All rights reserved.
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                                                                                                  //
@@ -71,7 +71,7 @@ input wren;
 input Away;
 input [1:0] round_mode;
 input [63:0] wrdata;
-output [273:0] ascOut;
+output [377:0] ascOut;
 
 // exception codes for two MSBs of result
 parameter _no_excpt_   = 2'b00;  
@@ -117,12 +117,9 @@ reg inexact_q1,
 reg [8:0] resultExponent;
 reg [7:0] resultSign;
 reg [7:0] expSign;
-reg [273:0] ascOut;
+reg [377:0] ascOut;
 
-//reg [4:0] intTrailZeros;                          
-                          
-reg [223:0] integerFractFinal; //28 bytes  (max 8 int digits plus max 20 fract digits
-//reg [4:0] fractTrailZeros;                          
+reg [327:0] integerFractFinal; //41 bytes  (max 20.2 int digits plus max 20 fract digits
 
 wire [39:0] expString;
 
@@ -169,8 +166,6 @@ wire [3:0] fractDigit2 ;
 wire [3:0] fractDigit1 ;
 wire [3:0] fractDigit0 ;
 
-//wire [20:0] intTrailZeroSel;
-
 wire [127:0] payloadStr;                          
 wire [327:0] integerFractWork;   
 
@@ -185,8 +180,6 @@ wire inexact;
 wire [67:0] bcdIntOut; 
 wire intInexact; 
 
-//wire [19:0] fracTrailZeroSel;
-
 wire input_is_infinite_del;
 wire input_is_underflow_del;
 wire input_is_nan_del;
@@ -199,52 +192,6 @@ assign input_is_nan_del = &wrdata_del_16[62:52] && |wrdata_del_16[50:0];
 assign input_is_snan_del = input_is_nan_del && ~wrdata_del_16[51];
 assign input_is_qnan_del = input_is_nan_del && wrdata_del_16[51];
 
-/*
-assign intTrailZeroSel = {|intDigit0,
-                          |intDigit1,
-                          |intDigit2,
-                          |intDigit3,
-                          |intDigit4,
-                          |intDigit5,
-                          |intDigit6,
-                          |intDigit7,
-                          |intDigit8, 
-                          |intDigit9, 
-                          |intDigit10,
-                          |intDigit11,
-                          |intDigit12,
-                          |intDigit13,
-                          |intDigit14,
-                          |intDigit15,
-                          |intDigit16,
-                          |intDigit17,
-                          |intDigit18,
-                          |intDigit19,
-                          |intDigit20  
-                         };
-*/
-/*    
-assign fracTrailZeroSel = {|fractDigit0, 
-                           |fractDigit1,
-                           |fractDigit2,
-                           |fractDigit3,
-                           |fractDigit4,
-                           |fractDigit5,
-                           |fractDigit6,
-                           |fractDigit7,
-                           |fractDigit8, 
-                           |fractDigit9, 
-                           |fractDigit10,
-                           |fractDigit11,
-                           |fractDigit12,
-                           |fractDigit13,
-                           |fractDigit14,
-                           |fractDigit15,
-                           |fractDigit16,
-                           |fractDigit17,
-                           |fractDigit18,
-                           |fractDigit19};
-*/
                                             
 assign inexact = fractInexact || intInexact;                  
 assign finalSel = {input_is_infinite_del,
@@ -393,80 +340,25 @@ binToDecH20Engine H20Eng(
     .baseExp       (baseExp       )
 );
 
-/*
-always @(*)
-//    (* parallel_case *)
-    casex(intTrailZeroSel)
-        21'b1xxxxxxxxxxxxxxxxxxxx : intTrailZeros = 0;
-        21'b01xxxxxxxxxxxxxxxxxxx : intTrailZeros = 1;
-        21'b001xxxxxxxxxxxxxxxxxx : intTrailZeros = 2;
-        21'b0001xxxxxxxxxxxxxxxxx : intTrailZeros = 3;
-        21'b00001xxxxxxxxxxxxxxxx : intTrailZeros = 4;
-        21'b000001xxxxxxxxxxxxxxx : intTrailZeros = 5;
-        21'b0000001xxxxxxxxxxxxxx : intTrailZeros = 6;
-        21'b00000001xxxxxxxxxxxxx : intTrailZeros = 7;
-        21'b000000001xxxxxxxxxxxx : intTrailZeros = 8;                        
-        21'b0000000001xxxxxxxxxxx : intTrailZeros = 9;                        
-        21'b00000000001xxxxxxxxxx : intTrailZeros = 10;                          
-        21'b000000000001xxxxxxxxx : intTrailZeros = 11;                          
-        21'b0000000000001xxxxxxxx : intTrailZeros = 12;                          
-        21'b00000000000001xxxxxxx : intTrailZeros = 13;                          
-        21'b000000000000001xxxxxx : intTrailZeros = 14;                          
-        21'b0000000000000001xxxxx : intTrailZeros = 15;                        
-        21'b00000000000000001xxxx : intTrailZeros = 16;                        
-        21'b000000000000000001xxx : intTrailZeros = 17;                        
-        21'b0000000000000000001xx : intTrailZeros = 18;                        
-        21'b00000000000000000001x : intTrailZeros = 19;                        
-        21'b000000000000000000001 : intTrailZeros = 20;                        
-                          default : intTrailZeros = 21;                     
-    endcase     
-*/    
-/*                     
-always @(*)
-//    (* parallel_case *)
-    casex(fracTrailZeroSel)
-        20'b1xxxxxxxxxxxxxxxxxxx : fractTrailZeros = 0;
-        20'b01xxxxxxxxxxxxxxxxxx : fractTrailZeros = 1;
-        20'b001xxxxxxxxxxxxxxxxx : fractTrailZeros = 2;
-        20'b0001xxxxxxxxxxxxxxxx : fractTrailZeros = 3;
-        20'b00001xxxxxxxxxxxxxxx : fractTrailZeros = 4;
-        20'b000001xxxxxxxxxxxxxx : fractTrailZeros = 5;
-        20'b0000001xxxxxxxxxxxxx : fractTrailZeros = 6;
-        20'b00000001xxxxxxxxxxxx : fractTrailZeros = 7;                           
-        20'b000000001xxxxxxxxxxx : fractTrailZeros = 8;                           
-        20'b0000000001xxxxxxxxxx : fractTrailZeros = 9;                           
-        20'b00000000001xxxxxxxxx : fractTrailZeros = 10;                          
-        20'b000000000001xxxxxxxx : fractTrailZeros = 11;                          
-        20'b0000000000001xxxxxxx : fractTrailZeros = 12;                          
-        20'b00000000000001xxxxxx : fractTrailZeros = 13;                          
-        20'b000000000000001xxxxx : fractTrailZeros = 14;                          
-        20'b0000000000000001xxxx : fractTrailZeros = 15;                          
-        20'b00000000000000001xxx : fractTrailZeros = 16;                          
-        20'b000000000000000001xx : fractTrailZeros = 17;                          
-        20'b0000000000000000001x : fractTrailZeros = 18;                          
-        20'b00000000000000000001 : fractTrailZeros = 19;                          
-                         default : fractTrailZeros = 20;                      
-    endcase                      
-*/
 always @(*)                                                                                      
     if (~|wrdata_del_16[62:0]) begin //zero
           expSign = char_Plus;
           resultSign = wrdata_del_16[63] ? char_Minus : char_Plus;    
           resultExponent = 9'b0;
-          integerFractFinal = {28{8'h30}};
-    end                            
+          integerFractFinal = {41{8'h30}};
+    end 
+                               
     else if (fractAllZeros) begin //integer only
-          expSign = char_Plus;
+          expSign = (baseExp < 21) ? char_Minus : char_Plus;
           resultSign = wrdata_del_16[63] ? char_Minus : char_Plus;                                          
-          resultExponent = baseExp;                                                           
-          integerFractFinal = {{20{8'h30}}, integerPart};                                                   
-    end                                                                                                     
+          resultExponent = (baseExp < 21) ? (20 - baseExp) : (baseExp - 20);                                                           
+          integerFractFinal = {integerPart, {20{8'h30}}};                                                   
+    end 
+                                                                                                        
     else begin //fraction part present with or without integer part 
           expSign = char_Minus;
           resultSign = wrdata_del_16[63] ? char_Minus : char_Plus;
-//          resultExponent = (20 - fractTrailZeros) + baseExp - fractionOnly;
           resultExponent = 20 + baseExp - fractionOnly;
-//          integerFractFinal = {{20{8'h30}}, integerFractWork} >> (fractTrailZeros * 8);                                                   
           integerFractFinal = integerFractWork;                                                   
     end    
     
@@ -534,13 +426,13 @@ end
   
 
 always @(posedge CLK)    //16th clock from first write enable at front end
-    (* parallel_case *)
+//    (* parallel_case *)
     casex(finalSel)
-        4'b1xxx : ascOut = {1'b0, 1'b1, {30{8'h20}}, resultSign, inf_string};
-        4'b01xx : ascOut = {2'b00, {13{8'h20}}, resultSign, nan_string, 8'h20, payloadStr[127:0]};
-        4'b001x : ascOut = {2'b00, {12{8'h20}}, resultSign, snan_string, 8'h20, payloadStr[127:0]};
-        4'b0001 : ascOut = {1'b1, 1'b0, resultSign, integerFractFinal[223:0], expString};  //with this H=20 format, all underflows are inexact                                        
-        default : ascOut = {inexact_q8, inexact_q8, resultSign, integerFractFinal[223:0], expString};  
+        4'b1xxx : ascOut = {1'b0, 1'b1, {43{8'h20}}, resultSign, inf_string};
+        4'b01xx : ascOut = {2'b00, {26{8'h20}}, resultSign, nan_string, 8'h20, payloadStr[127:0]};
+        4'b001x : ascOut = {2'b00, {25{8'h20}}, resultSign, snan_string, 8'h20, payloadStr[127:0]};
+        4'b0001 : ascOut = {1'b1, inexact_q8, resultSign, integerFractFinal, expString};                                          
+        default : ascOut = {inexact_q8, inexact_q8, resultSign, integerFractFinal, expString};  
     endcase
 
 endmodule

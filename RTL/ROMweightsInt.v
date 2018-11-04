@@ -1,7 +1,7 @@
 // ROMweightsInt.v
  `timescale 1ns/100ps
 // Author:  Jerry D. Harthcock
-// Version:  1.00  September 14, 2018
+// Version:  1.02  November 4, 2018
 // Copyright (C) 2018.  All rights reserved.
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,6 +85,8 @@ output fractionOnly;
 input [5:0] subnLeadZeros;
 
 //(* ram_style = "distributed" *) 
+//(* rom_style = "block" *) reg  [140:0] RAMA[1023:0];
+//(* rom_style = "block" *) reg  [140:0] rddata;
 reg  [140:0] RAMA[1023:0];
 reg  [140:0] rddata;
 reg intEnable;

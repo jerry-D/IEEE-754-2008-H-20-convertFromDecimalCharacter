@@ -1,7 +1,7 @@
 // DecCharToBinROMweightsInt.v
  `timescale 1ns/100ps
 // Author:  Jerry D. Harthcock
-// Version:  1.00  October 15, 2018
+// Version:  1.02  November 4, 2018
 // Copyright (C) 2018.  All rights reserved.
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,6 @@ module DecCharToBinROMweightsInt (
     fractIsSubnormal,    
     integerPartBin,
     IntWeightOut,
-//    IntTruncOut,
     binExpOut
     );    
 
@@ -77,12 +76,12 @@ input  intIsZero;
 input  fractIsSubnormal;
 input [67:0] integerPartBin;
 output [66:0] IntWeightOut;
-//output [73:0] IntTruncOut;
 output [10:0] binExpOut;
 
 //(* ram_style = "distributed" *) 
+//(* rom_style = "block" *) reg  [66:0] RAMA[308:0];
+//(* rom_style = "block" *) reg  [10:0] RAMC[308:0];
 reg  [66:0] RAMA[308:0];
-//reg  [74:0] RAMB[308:0];
 reg  [10:0] RAMC[308:0];
 
 reg [66:0] IntWeightOut;
@@ -93,7 +92,6 @@ wire [8:0] decExp;
 assign decExp = (intIsZero || fractIsSubnormal) ? 308 : decExpIn;
 
 reg [66:0] IntWeight;
-//reg [73:0] IntTrunc;
 reg [10:0] binExp;
 
 initial begin

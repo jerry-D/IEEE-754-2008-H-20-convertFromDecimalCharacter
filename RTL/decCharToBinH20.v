@@ -1,7 +1,7 @@
 //  decCharToBinH20.v
  
 // Author:  Jerry D. Harthcock
-// Version:  1.00  October 13, 2018
+// Version:  1.02  November 4, 2018
 // Copyright (C) 2018.  All rights reserved.
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ input RESET;
 input [1:0] round_mode;
 input Away;
 input wren;
-input [271:0] wrdata;
+input [375:0] wrdata;
 output [65:0] binOut;
 
 parameter char_0 = 8'h30;
@@ -92,19 +92,21 @@ parameter POSINF  = 2'b01;
 parameter NEGINF  = 2'b10;
 parameter ZERO    = 2'b11;
 
-// digit                           27        26        25        24        23        22        21        20        19        18        17        16        15        14        13        12        11        10         9         8         7       6       5       4       3       2       1       0
-//                                  |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |       |       |       |       |       |       |       |
-// Char position          33       32        31        30        29        28        27        26        25        24        23        22        21        20        19        18        17        16        15        14        13        12      11      10       9       8       7       6       5       4       3       2      1      0
-// ascii code  hex      + 2B       3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x      3x      3x      3x      3x      3x      3x      3x      e 65   + 2B     3x     3x     3x
-//                      - 2D        |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |       |       |       |       |       |       |       |      E 45   - 2D      |      |      |
-// entire byte        [271:264] [263:256] [255:248] [247:240] [239:232] [231:224] [223:216] [215:208] [207:200] [199:192] [191:184] [183:176] [175:168] [167:160] [159:152] [151:144] [143:136] [135:128] [127:120] [119:112] [111:104] [103:96] [95:88] [87:80] [79:72] [71:64] [63:56] [55:48] [47:40] [39:32] [31:24] [23:16] [15:8] [7:0]
-// lower nyble only   [267:264] [259:256] [251:248] [243:240] [235:232] [227:224] [219:216] [211:208] [203:200] [195:192] [187:184] [179:176] [171:168] [163:160] [155:152] [147:144] [139:136] [131:128] [123:120] [115:112] [107:104]  [99:96] [91:88] [83:80] [75:72] [67:64] [59:56] [51:48] [43:40] [35:32] [27:24] [19:16] [11:8] [3:0]
-//                        |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |       |       |       |       |       |       |       |       |       |       |      |      |
-// nan                   20        20        20        20        20        20        20        20        20        20        20        20        20       2B/2D      6E        61        6E        20        3x        20        3x        3x      3x      3x      20      3x      3x      3x      3x      20      3x      3x     3x     3x
-// snan                  20        20        20        20        20        20        20        20        20        20        20        20       2B/2D      73        6E        61        6E        20        3x        20        3x        3x      3x      3x      20      3x      3x      3x      3x      20      3x      3x     3x     3x
-// infinity              20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20      20      20      20      20      20      20      20      20     2B/2D    69     6E     66
-// zero                2B/2D       30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30      30      30      30      30      30      30      30      e 65   + 2B     30     30     30
-//
+//                                                                                                                                                                                                                         <---- Integer Part --->|<---- Fraction Part --->
+//                                                                                                                                                                                                                                                |
+// digit                           40        39        38        37        36        35        34        33        32        31        30        29        28        27        26        25        24        23        22        21        20     |    19        18        17        16        15        14        13        12        11        10         9         8         7       6       5       4       3       2       1       0
+//                                  |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |     |     |         |         |         |         |         |         |         |         |         |         |         |         |       |       |       |       |       |       |       |
+// Char position          46       45        44        43        42        41        40        39        38        37        36        35        34        33        32        31        30        29        28        27        26        25     |    24        23        22        21        20        19        18        17        16        15        14        13        12      11      10       9       8       7       6       5       4       3       2      1      0
+// ascii code  hex      + 2B       3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x     |    3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x        3x      3x      3x      3x      3x      3x      3x      3x      e 65   + 2B     3x     3x     3x
+//                      - 2D        |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |     |     |         |         |         |         |         |         |         |         |         |         |         |         |       |       |       |       |       |       |       |      E 45   - 2D      |      |      |
+// entire byte        [375:368] [367:360] [359:352] [351:344] [343:336] [335:328] [327:320] [319:312] [311:304] [303:296] [295:288] [287:280] [279:272] [271:264] [263:256] [255:248] [247:240] [239:232] [231:224] [223:216] [215:208] [207:200] | [199:192] [191:184] [183:176] [175:168] [167:160] [159:152] [151:144] [143:136] [135:128] [127:120] [119:112] [111:104] [103:96] [95:88] [87:80] [79:72] [71:64] [63:56] [55:48] [47:40] [39:32] [31:24] [23:16] [15:8] [7:0]
+// lower nyble only   [371:368] [363:360] [355:352] [347:344] [339:336] [331:328] [323:320] [315:312] [307:304] [299:296] [291:288] [283:280] [275:272] [267:264] [259:256] [251:248] [243:240] [235:232] [227:224] [219:216] [211:208] [203:200] | [195:192] [187:184] [179:176] [171:168] [163:160] [155:152] [147:144] [139:136] [131:128] [123:120] [115:112] [107:104]  [99:96] [91:88] [83:80] [75:72] [67:64] [59:56] [51:48] [43:40] [35:32] [27:24] [19:16] [11:8] [3:0]
+//                        |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |         |     |     |         |         |         |         |         |         |         |         |         |         |         |         |       |       |       |       |       |       |       |       |       |       |      |      |
+// nan                   20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20     |    20        20        20        20       2B/2D      6E        61        6E        20        3x        20        3x        3x      3x      3x      20      3x      3x      3x      3x      20      3x      3x     3x     3x
+// snan                  20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20     |    20        20        20       2B/2D      73        6E        61        6E        20        3x        20        3x        3x      3x      3x      20      3x      3x      3x      3x      20      3x      3x     3x     3x
+// infinity              20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20        20     |    20        20        20        20        20        20        20        20        20        20        20        20        20      20      20      20      20      20      20      20      20     2B/2D    69     6E     66
+// zero                2B/2D       30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30        30     |    30        30        30        30        30        30        30        30        30        30        30        30        30      30      30      30      30      30      30      30      e 65   + 2B     30     30     30
+//                                                                                                              
 
 reg input_is_negative;
 
@@ -130,18 +132,18 @@ always @(*)
     if (input_is_nan) input_is_negative = (wrdata[167:160]==8'h2D);
     else if (input_is_snan) input_is_negative = (wrdata[175:168]==8'h2D);
     else if (input_is_infinite) input_is_negative = (wrdata[31:24]==8'h2D); 
-    else input_is_negative = (wrdata[271:264]==8'h2D);
+    else input_is_negative = (wrdata[375:368]==8'h2D);
 
 assign expInDig0 = wrdata[3:0];
 assign expInDig1 = wrdata[11:8];
 assign expInDig2 = wrdata[19:16];
 assign decExp = (expInDig2 * 100) + (expInDig1 * 10) + expInDig0;
 
-assign input_is_zero =    ((wrdata[271:264]==8'h2B) || (wrdata[271:264]==8'h2D)) && 
-                           (wrdata[263:40]=={28{8'h30}}) && ((wrdata[39:32]==8'h65) || (wrdata[39:32]==8'h45)) &&
+assign input_is_zero =    ((wrdata[375:368]==8'h2B) || (wrdata[375:368]==8'h2D)) && 
+                           (wrdata[367:40]=={41{8'h30}}) && ((wrdata[39:32]==8'h65) || (wrdata[39:32]==8'h45)) &&
                            (wrdata[31:0]==32'h2B303030);
                            
-assign input_is_infinite = (wrdata[271:32]=={30{8'h20}}) && ((wrdata[31:24]==8'h2B) || (wrdata[31:24]==8'h2D)) && (wrdata[23:0]==24'h696e66); 
+assign input_is_infinite = (wrdata[375:32]=={43{8'h20}}) && ((wrdata[31:24]==8'h2B) || (wrdata[31:24]==8'h2D)) && (wrdata[23:0]==24'h696e66); 
 
 wire [7:0] plChar15;
 wire [7:0] plChar14;
@@ -316,13 +318,27 @@ assign good_payload = &{GoodplChar15,
                         GoodplChar0 
                         };
                       
-assign input_is_nan = (wrdata[271:168]=={13{8'h20}}) && ((wrdata[167:160]==8'h2B) || (wrdata[167:160]==8'h2D) || (wrdata[167:160]==8'h20)) && 
+assign input_is_nan = (wrdata[375:168]=={26{8'h20}}) && ((wrdata[167:160]==8'h2B) || (wrdata[167:160]==8'h2D) || (wrdata[167:160]==8'h20)) && 
                       (wrdata[159:128]==32'h6E616E20) && good_payload;
                       
-assign input_is_snan = (wrdata[271:176]=={12{8'h20}}) && ((wrdata[175:168]==8'h2B) || (wrdata[175:168]==8'h2D) || (wrdata[175:168]==8'h20)) && 
+                      
+assign input_is_snan = (wrdata[375:176]=={25{8'h20}}) && ((wrdata[175:168]==8'h2B) || (wrdata[175:168]==8'h2D) || (wrdata[175:168]==8'h20)) && 
                        (wrdata[167:128]==40'h736E616E20) && good_payload; 
 
-assign good_number = (wrdata[263:260]==4'h3) &&
+assign good_number = (wrdata[367:364]==4'h3) &&
+                     (wrdata[359:356]==4'h3) &&
+                     (wrdata[351:348]==4'h3) &&
+                     (wrdata[343:340]==4'h3) &&
+                     (wrdata[335:332]==4'h3) &&
+                     (wrdata[327:324]==4'h3) &&
+                     (wrdata[319:316]==4'h3) &&
+                     (wrdata[311:308]==4'h3) &&
+                     (wrdata[303:300]==4'h3) &&
+                     (wrdata[295:292]==4'h3) &&
+                     (wrdata[287:284]==4'h3) &&
+                     (wrdata[279:276]==4'h3) &&
+                     (wrdata[271:268]==4'h3) &&
+                     (wrdata[263:260]==4'h3) &&
                      (wrdata[255:252]==4'h3) &&
                      (wrdata[247:244]==4'h3) &&
                      (wrdata[239:236]==4'h3) &&
@@ -350,8 +366,10 @@ assign good_number = (wrdata[263:260]==4'h3) &&
                      (wrdata[ 63: 60]==4'h3) &&
                      (wrdata[ 55: 52]==4'h3) &&
                      (wrdata[ 47: 44]==4'h3) ;
+                     
+                     
                        
-assign input_is_good_number = ((wrdata[271:264]==8'h2B) || (wrdata[271:264]==8'h2D)) &&
+assign input_is_good_number = ((wrdata[375:368]==8'h2B) || (wrdata[375:368]==8'h2D)) &&
                               good_number &&
                               ((wrdata[39:32]==8'h65) || (wrdata[39:32]==8'h45)) &&
                               ((wrdata[31:24]==8'h2B) || (wrdata[31:24]==8'h2d)) &&
@@ -366,18 +384,32 @@ assign input_is_invalid = ~input_is_zero     &&
                           ~input_is_good_number;
                           
 
+wire [3:0] digIn40;
+wire [3:0] digIn39;
+wire [3:0] digIn38;
+wire [3:0] digIn37;
+wire [3:0] digIn36;
+wire [3:0] digIn35;
+wire [3:0] digIn34;
+wire [3:0] digIn33;
+wire [3:0] digIn32;
+wire [3:0] digIn31;
+wire [3:0] digIn30;
+wire [3:0] digIn29;
+wire [3:0] digIn28;
 wire [3:0] digIn27;
 wire [3:0] digIn26;
 wire [3:0] digIn25;
 wire [3:0] digIn24;
-wire [3:0] digIn23;
-wire [3:0] digIn22;
-wire [3:0] digIn21;
-wire [3:0] digIn20;
-wire [3:0] digIn19;
-wire [3:0] digIn18;
-wire [3:0] digIn17;
-wire [3:0] digIn16;
+wire [3:0] digIn23;    //      /\
+wire [3:0] digIn22;    //      ||
+wire [3:0] digIn21;    //      ||
+wire [3:0] digIn20;    // integer part (20.2 digits)
+
+wire [3:0] digIn19;    // fraction part (20 digits)
+wire [3:0] digIn18;    //      ||
+wire [3:0] digIn17;    //      ||
+wire [3:0] digIn16;    //      \/
 wire [3:0] digIn15;
 wire [3:0] digIn14;
 wire [3:0] digIn13;
@@ -394,7 +426,20 @@ wire [3:0] digIn3;
 wire [3:0] digIn2;
 wire [3:0] digIn1;
 wire [3:0] digIn0;
-
+               
+assign digIn40 = wrdata[363:360];
+assign digIn39 = wrdata[355:352];
+assign digIn38 = wrdata[347:344];
+assign digIn37 = wrdata[339:336];
+assign digIn36 = wrdata[331:328];
+assign digIn35 = wrdata[323:320];
+assign digIn34 = wrdata[315:312];
+assign digIn33 = wrdata[307:304];
+assign digIn32 = wrdata[299:296];
+assign digIn31 = wrdata[291:288];
+assign digIn30 = wrdata[283:280];
+assign digIn29 = wrdata[275:272];
+assign digIn28 = wrdata[267:264];
 assign digIn27 = wrdata[259:256];
 assign digIn26 = wrdata[251:248];
 assign digIn25 = wrdata[243:240];
@@ -424,8 +469,21 @@ assign digIn2  = wrdata[ 59: 56];
 assign digIn1  = wrdata[ 51: 48];
 assign digIn0  = wrdata[ 43: 40];
 
-wire [111:0] decIn;
-assign decIn = {digIn27, 
+wire [163:0] decIn;
+assign decIn = {digIn40,
+                digIn39,
+                digIn38,
+                digIn37,
+                digIn36,
+                digIn35,
+                digIn34,
+                digIn33,
+                digIn32,
+                digIn31,
+                digIn30,
+                digIn29,
+                digIn28,
+                digIn27, 
                 digIn26, 
                 digIn25, 
                 digIn24, 
@@ -456,39 +514,57 @@ assign decIn = {digIn27,
 
 wire [7:0] expSignChar;
 assign expSignChar = wrdata[31:24];
-wire [111:0] integerPartDecWork;  //up to 20.2 digits for integer part
-assign integerPartDecWork = (expSignChar==char_Plus) ? decIn[83:0] : ((decExp < 21) ? (decIn >> (decExp * 4)) : 112'b0);
+
 wire [83:0] integerPartDec;
-assign integerPartDec = integerPartDecWork[83:0];
+assign integerPartDec = {digIn40,
+                         digIn39,
+                         digIn38,
+                         digIn37,
+                         digIn36,
+                         digIn35,
+                         digIn34,
+                         digIn33,
+                         digIn32,
+                         digIn31,
+                         digIn30,
+                         digIn29,
+                         digIn28,
+                         digIn27,
+                         digIn26,
+                         digIn25,
+                         digIn24,
+                         digIn23,
+                         digIn22,
+                         digIn21,
+                         digIn20
+                         };
 
 wire expIsMinus;
 assign expIsMinus = (expSignChar==char_Minus);
 
-reg [79:0] fractPartDec;
-always @(*)
-    case(decExp)
-        9'd001 : fractPartDec = expIsMinus ? {decIn[ 3:0], 76'b0} : 80'b0;
-        9'd002 : fractPartDec = expIsMinus ? {decIn[ 7:0], 72'b0} : 80'b0;
-        9'd003 : fractPartDec = expIsMinus ? {decIn[11:0], 68'b0} : 80'b0;
-        9'd004 : fractPartDec = expIsMinus ? {decIn[15:0], 64'b0} : 80'b0;
-        9'd005 : fractPartDec = expIsMinus ? {decIn[19:0], 60'b0} : 80'b0;
-        9'd006 : fractPartDec = expIsMinus ? {decIn[23:0], 56'b0} : 80'b0;
-        9'd007 : fractPartDec = expIsMinus ? {decIn[27:0], 52'b0} : 80'b0;
-        9'd008 : fractPartDec = expIsMinus ? {decIn[31:0], 48'b0} : 80'b0;
-        9'd009 : fractPartDec = expIsMinus ? {decIn[35:0], 44'b0} : 80'b0;
-        9'd010 : fractPartDec = expIsMinus ? {decIn[39:0], 40'b0} : 80'b0;
-        9'd011 : fractPartDec = expIsMinus ? {decIn[43:0], 36'b0} : 80'b0;
-        9'd012 : fractPartDec = expIsMinus ? {decIn[47:0], 32'b0} : 80'b0;
-        9'd013 : fractPartDec = expIsMinus ? {decIn[51:0], 28'b0} : 80'b0;
-        9'd014 : fractPartDec = expIsMinus ? {decIn[55:0], 24'b0} : 80'b0;
-        9'd015 : fractPartDec = expIsMinus ? {decIn[59:0], 20'b0} : 80'b0;
-        9'd016 : fractPartDec = expIsMinus ? {decIn[63:0], 16'b0} : 80'b0;
-        9'd017 : fractPartDec = expIsMinus ? {decIn[67:0], 12'b0} : 80'b0;
-        9'd018 : fractPartDec = expIsMinus ? {decIn[71:0],  8'b0} : 80'b0;
-        9'd019 : fractPartDec = expIsMinus ? {decIn[75:0],  4'b0} : 80'b0;
-       default : fractPartDec = expIsMinus ?  decIn[79:0]         : 80'b0;
-    endcase
 
+wire [79:0] fractPartDec;
+assign fractPartDec = {digIn19,
+                       digIn18,
+                       digIn17,
+                       digIn16,
+                       digIn15,
+                       digIn14,
+                       digIn13,
+                       digIn12,
+                       digIn11,
+                       digIn10,
+                       digIn9, 
+                       digIn8, 
+                       digIn7, 
+                       digIn6, 
+                       digIn5, 
+                       digIn4, 
+                       digIn3, 
+                       digIn2, 
+                       digIn1, 
+                       digIn0
+                       };
 
 wire [3:0] integerPartDec20;
 wire [3:0] integerPartDec19;
@@ -675,10 +751,10 @@ reg [8:0] decExpForLookUp;
 
 always @(*)
     if (intIsZero) decExpForLookUp = 0;
-    else if (fractIsZero && |intLeadZeroDigits_q2) decExpForLookUp = decExp_del_2 + (20 - intLeadZeroDigits_q2);
-    else if (fractIsZero && ~|intLeadZeroDigits_q2) decExpForLookUp = decExp_del_2 + 19;
-    else decExpForLookUp = (decExp_del_2 - intLeadZeroDigits_q2);
-
+    else if (|intLeadZeroDigits_q2 && expIsMinus_q2) decExpForLookUp = (decExp_del_2 - 20) + (20 - intLeadZeroDigits_q2);
+    else if (~|intLeadZeroDigits_q2) decExpForLookUp = decExp_del_2 + 39;
+    else decExpForLookUp = (decExp_del_2 + 20) + (20 - intLeadZeroDigits_q2) ;
+    
 reg wren_del_0,
     wren_del_1,
     wren_del_2;
@@ -695,8 +771,6 @@ always @(posedge CLK)
         wren_del_2 <= wren_del_1;        
     end    
     
-    
-
 reg [67:0] integerPartBin20;
 reg [66:0] integerPartBin19;
 reg [66:0] integerPartBin18;
@@ -911,7 +985,7 @@ always @(posedge CLK)
             expIsMinus_q22 <= expIsMinus_q21;
     end
 
-assign input_is_overflow = (((integerPartBin > 68'D179769313486231570815) && (decExp_del_2 == 288)) || (decExp_del_2 > 288)) && ~expIsMinus_q2;
+assign input_is_overflow = (((integerPartBin > 68'D179769313486231570815) && (decExp_del_2 == 268)) || (decExp_del_2 > 268)) && ~expIsMinus_q2;
 
 wire maxSubNorm;
 assign maxSubNorm = (fractPartBin <=  67'D22250738585072008890);
@@ -2002,7 +2076,7 @@ wire fractInexact;
 wire [5:0]  subnShiftAmtOut;
 
 wire [8:0] fractExp_q2;
-assign fractExp_q2 = (intLeadZeroDigits_q2 != 21) ? 9'b0 : (decExp_del_2 - 19);  //if any integer part digits are not zero, then substitue 0 for exp
+assign fractExp_q2 = (intLeadZeroDigits_q2 != 21) ? 9'b0 : (decExp_del_2 - 19);  //if any integer part digits are not zero, then substitue 0 for fraction exp
 
 decCharToBinFractPart fracPart(
     .CLK             (CLK             ),

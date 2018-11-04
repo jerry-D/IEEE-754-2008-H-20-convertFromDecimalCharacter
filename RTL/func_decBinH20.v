@@ -80,7 +80,7 @@ input RESET, CLK, wren, rdenA, rdenB;
 input [1:0] round_mode_q2;
 input Away_q2;
 input [3:0] wraddrs, rdaddrsA, rdaddrsB;   
-input [271:0] wrdata;
+input [375:0] wrdata;
 
 output [65:0] rddataA, rddataB;
 output ready;
@@ -167,7 +167,8 @@ RAM_func #(.ADDRS_WIDTH(4), .DATA_WIDTH(66))
     .rddataA    (rddataA ),
     .rdenB      (rdenB   ),
     .rdaddrsB   (rdaddrsB),
-    .rddataB    (rddataB ));
+    .rddataB    (rddataB )
+    );
 
 
 always @(posedge CLK) begin

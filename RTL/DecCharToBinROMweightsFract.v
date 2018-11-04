@@ -1,7 +1,7 @@
 // DecCharToBinROMweightsFract.v
  `timescale 1ns/100ps
 // Author:  Jerry D. Harthcock
-// Version:  1.00  October 20, 2018
+// Version:  1.02  November 4, 2018
 // Copyright (C) 2018.  All rights reserved.
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,6 +81,8 @@ output [10:0] binExpOut;
 output [5:0]  subnShiftAmtOut;
 
 //(* ram_style = "distributed" *) 
+//(* rom_style = "block" *) reg  [66:0] RAMA[308:0];
+//(* rom_style = "block" *) reg  [10:0] RAMC[308:0];
 reg  [66:0] RAMA[308:0];
 reg  [10:0] RAMC[308:0];
 
