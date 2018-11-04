@@ -3,6 +3,7 @@
 ## IEEE 754-2008  H=20 "convertFromDecimalCharacter"  
 ### Double-Precision FLoating-Point Operator for Xilinx UltraScale and UltraScale+ FPGAs
 
+(November 4, 2018) Both the convertToDecimalCharacter and convertFromDecimalCharacter operators have been revised such that the decimal character strings are now 47 characters in length (see examples below).  
 (November 1, 2018) Written in Verilog RTL for implementation in Xilinx UltraScale and UltraScale+ brand FPGAs, this is probably the world's only synthesizable IEEE 754-2008 compliant, H=20 binary64 format "convertFromDecimalCharacter" floating-point operator.  It is designed for ready incorporation into the new 64-bit, IEEE 754-2008 Floating-Point Instruction Set Architecture (ISA) CPU presently in development.
 
 Its pipeline is 24 clocks deep, meaning that up to sixteen 64-bit results will be available for reading after 24 clocks from the first write of a 47-byte floating-point character string into each of this operator's sixteen 47-byte memory-mapped inputs.  
