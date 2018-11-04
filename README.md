@@ -26,7 +26,7 @@ This repository contains the required synthesizable Verilog RTL and test bench t
     uw AR3 = uw:#cnvTFCS.0           ;load write pointer with first input address of the binaryFromCharacterSequence operator
        REPEAT uw:#15                 ;load repeat counter with number results to read out   
        
-    g64 *AR3++[64] = convertToDecimalCharacter:(g64:*AR2++[64])   ;pull sixteen 47-byte character sequences from their respective   
+    g64 *AR3++[64] = convertFromDecimalCharacter:(g64:*AR2++[64])   ;pull sixteen 47-byte character sequences from their respective   
                                      ;result buffers and write them to the corresponding input of the binaryFromCharacterSequence
 ```
 The above example SYMPL IL code performs 16 binaryToCharacterSequence conversions and 16 binaryFromCharacterSequence conversions in as few as 41 clocks.
