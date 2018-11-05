@@ -38,8 +38,8 @@ It should be noted that the binaryFromCharacterSequence results are actually 66 
 
 Also note that the binaryToCharacterSequence operator can accept binary16, binary32 and binary64 formated numbers directly, without having to explicitly convert them before pushing them in.
 ```
-      34-byte Character Sequence Input                      Binary64 Result     Comment
-
+      41-Character Sequence Input                           Binary64 Result     Comment
+      |<---Integer Part--->||<--Fraction Part-->|
       +00000000000003355443194222818687558174133e-020       417FFFFFFF135DDD   //33554431.94222818687558174133
       
       +17976931348623157081500000000000000000000e+268       7FEFFFFFFFFFFFFF   //largest integer
